@@ -1,21 +1,21 @@
+#include "doubles.h"
 #include "vector.h"
 
 int main(int argc, const char* argv[]) {
 	Vector vector;
-	int x, y, sum;
+	double x, y, sum;
 
 	/* Choose initial capacity of 10 */
-	/* Specify the size of the elements you want to store once */
-	vector_setup(&vector, 10, sizeof(int));
+  doubles_vector_setup(&vector, 10);
 
-	x = 6, y = 9;
+	x = 6.0, y = 9.0;
 	vector_push_back(&vector, &x);
 	vector_insert(&vector, 0, &y);
 	vector_assign(&vector, 0, &y);
 
-	x = *(int*)vector_get(&vector, 0);
-	y = *(int*)vector_back(&vector);
-	x = VECTOR_GET_AS(int, &vector, 1);
+	x = *(double*)vector_get(&vector, 0);
+	y = *(double*)vector_back(&vector);
+	x = VECTOR_GET_AS(double, &vector, 1);
 
 	vector_erase(&vector, 1);
 
@@ -23,13 +23,13 @@ int main(int argc, const char* argv[]) {
 	Iterator iterator = vector_begin(&vector);
 	Iterator last = vector_end(&vector);
 	for (; !iterator_equals(&iterator, &last); iterator_increment(&iterator)) {
-		*(int*)iterator_get(&iterator) += 1;
+		*(double*)iterator_get(&iterator) += 1;
 	}
 
 	/* Or just use pretty macros */
-	sum = 0;
+	sum = 0.0;
 	VECTOR_FOR_EACH(&vector, i) {
-		sum += ITERATOR_GET_AS(int, &i);
+		sum += ITERATOR_GET_AS(double, &i);
 	}
 
 	/* Memory management interface */

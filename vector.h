@@ -40,7 +40,7 @@
 
 typedef struct
 {
-  char *(*const _iter_type)(void);
+  int (*const _iter_type)(void);
   void *(*const _iter_pointer)(void *self);
   void *(*const _iter_next)(void *self);
   void *(*const _iter_prev)(void *self);
@@ -54,7 +54,7 @@ typedef struct {
 typedef struct
 {
   size_t (*const _vec_elem_size)(void);
-  char *(*const _vec_type)(void);
+  int (*const _vec_type)(void);
   size_t (*const _vec_size)(void *self);
   size_t (*const _vec_cap)(void *self);
   void *(*const _vec_data)(void *self);
@@ -65,6 +65,7 @@ typedef struct
   const void *(*const _vec_const_offset)(const void *self, size_t index);
   void *(*const _vec_offset_next)(void *offset);
   Iterator  (*const _vec_iterator)(void* self, size_t index);
+  int (*const _vec_destroy)(void* self);
 } VectorTC;
 
 typedef struct

@@ -184,13 +184,13 @@ int vector_copy(Vector* dest, Vector* src)
 	assert(src != NULL);
 	assert(vector_is_initialized(src));
 	assert(!vector_is_initialized(dest));
-	assert(strcmp(dest->tc->_vec_type(), src->tc->_vec_type()) == 0);
+	assert(dest->tc->_vec_type() == src->tc->_vec_type());
 
 	if (dest == NULL) return VECTOR_ERROR;
 	if (src == NULL) return VECTOR_ERROR;
 	if (vector_is_initialized(dest)) return VECTOR_ERROR;
 	if (!vector_is_initialized(src)) return VECTOR_ERROR;
-	if (strcmp(dest->tc->_vec_type(), src->tc->_vec_type()) != 0) {
+	if (dest->tc->_vec_type() != src->tc->_vec_type()) {
     return VECTOR_ERROR;
   }
 
@@ -216,13 +216,13 @@ int vector_copy_assign(Vector* dest, Vector* src)
 	assert(src != NULL);
 	assert(vector_is_initialized(src));
 	assert(vector_is_initialized(dest));
-	assert(strcmp(dest->tc->_vec_type(), src->tc->_vec_type()) == 0);
+	assert(dest->tc->_vec_type() == src->tc->_vec_type());
 
 	if (dest == NULL) return VECTOR_ERROR;
 	if (src == NULL) return VECTOR_ERROR;
 	if (!vector_is_initialized(dest)) return VECTOR_ERROR;
 	if (!vector_is_initialized(src)) return VECTOR_ERROR;
-	if (strcmp(dest->tc->_vec_type(), src->tc->_vec_type()) != 0) {
+  if (dest->tc->_vec_type() != src->tc->_vec_type()) {
     return VECTOR_ERROR;
   }
 
@@ -259,13 +259,13 @@ int vector_swap(Vector* dest, Vector* src)
 	assert(src != NULL);
 	assert(vector_is_initialized(src));
 	assert(vector_is_initialized(dest));
-	assert(strcmp(dest->tc->_vec_type(), src->tc->_vec_type()) == 0);
+	assert(dest->tc->_vec_type() == src->tc->_vec_type());
 
 	if (dest == NULL) return VECTOR_ERROR;
 	if (src == NULL) return VECTOR_ERROR;
 	if (!vector_is_initialized(dest)) return VECTOR_ERROR;
 	if (!vector_is_initialized(src)) return VECTOR_ERROR;
-	if (strcmp(dest->tc->_vec_type(), src->tc->_vec_type()) != 0) {
+	if (dest->tc->_vec_type() != src->tc->_vec_type()) {
     return VECTOR_ERROR;
   }
 
@@ -287,16 +287,15 @@ int vector_swap(Vector* dest, Vector* src)
 int vector_destroy(Vector *v)
 {
 	assert(v != NULL);
-	assert(v->self != NULL);
 
 	if (v == NULL) return VECTOR_ERROR;
-	if (v->self == NULL) return VECTOR_ERROR;
 
-	free(v->tc->_vec_data(v->self));
-	free(v->self);
-  v->self = NULL;
+  if (v->tc->_vec_destroy(v->self) == 0) {
+    v->self = NULL;
+    return VECTOR_SUCCESS;
+  }
 
-	return VECTOR_SUCCESS;
+  return VECTOR_ERROR;
 }
 
 /* Insertion */
@@ -606,21 +605,21 @@ void* iterator_previous(Iterator* iter)
 
 bool iterator_equals(Iterator* first, Iterator* second)
 {
-	assert(strcmp(first->tc->_iter_type(), second->tc->_iter_type()) == 0);
+	assert(first->tc->_iter_type() ==  second->tc->_iter_type());
 
 	return iterator_get(first) == iterator_get(second);
 }
 
 bool iterator_is_before(Iterator* first, Iterator* second)
 {
-	assert(strcmp(first->tc->_iter_type(), second->tc->_iter_type()) == 0);
+  assert(first->tc->_iter_type() == second->tc->_iter_type());
 
 	return iterator_get(first) < iterator_get(second);
 }
 
 bool iterator_is_after(Iterator* first, Iterator* second)
 {
-	assert(strcmp(first->tc->_iter_type(), second->tc->_iter_type()) == 0);
+	assert(first->tc->_iter_type() == second->tc->_iter_type());
 
 	return iterator_get(first) > iterator_get(second);
 }
@@ -630,7 +629,7 @@ size_t iterator_index(Vector *v, Iterator* iter)
 	assert(v != NULL);
 	assert(v->self != NULL);
 	assert(iter != NULL);
-	assert(strcmp(v->tc->_vec_type(), iter->tc->_iter_type()) == 0);
+	assert(v->tc->_vec_type() == iter->tc->_iter_type());
 
 	return (iter->tc->_iter_pointer(iter->self) - v->tc->_vec_data(v->self)) /
     v->tc->_vec_elem_size();

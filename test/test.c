@@ -74,7 +74,7 @@ int main(int argc, const char* argv[]) {
 	assert(vector_is_empty(&vector));
 	assert(vector_capacity(&vector) == VECTOR_MINIMUM_CAPACITY);
 
-	vector_destroy(&vector);
+	assert(vector_destroy(&vector) == 0);
 
 	printf("\033[92mALL TEST PASSED\033[0m\n");
 }

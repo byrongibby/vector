@@ -7,9 +7,9 @@
 
 /***** ITERATOR *****/
 
-char *doubles_iter_type(void)
+int doubles_iter_type(void)
 {
-  return "doubles";
+  return 1;
 }
 
 double *doubles_iter_pointer(double *pointer)
@@ -32,7 +32,7 @@ double *doubles_iter_prev(double *pointer)
 
 /* Wrapper functions */
 
-static inline char *doubles_iter_type__(void)
+static inline int doubles_iter_type__(void)
 {
   return doubles_iter_type();
 }
@@ -73,9 +73,9 @@ size_t doubles_elem_size(void)
   return sizeof(double);
 }
 
-char *doubles_type(void)
+int doubles_type(void)
 {
-  return "doubles";
+  return 1;
 }
 
 size_t doubles_size(Doubles *doubles)
@@ -132,18 +132,37 @@ double *doubles_offset_next(double *offset)
   return offset + 1;
 }
 
-double *doubles_iterator(Doubles *doubles, size_t index) {
-  double *pointer = NULL;
+Iterator doubles_iterator(Doubles *doubles, size_t index) {
+  Iterator iterator;
 
   assert(doubles != NULL);
   assert(index <= doubles->size);
 
-  if (doubles == NULL) return pointer;
-  if (index > doubles->size) return pointer;
+  if (doubles == NULL) return iterator;
+  if (index > doubles->size) return iterator;
 
-  pointer = doubles_offset(doubles, index);
+  static IteratorTC const iterator_tc = {
+    ._iter_type    = doubles_iter_type__,
+    ._iter_pointer = doubles_iter_pointer__,
+    ._iter_next    = doubles_iter_next__,
+    ._iter_prev    = doubles_iter_prev__,
+  };
 
-  return pointer;
+  iterator.tc = &iterator_tc;
+  iterator.self = doubles_offset(doubles, index);
+
+  return iterator;
+}
+
+int doubles_destroy(Doubles *doubles) {
+	assert(doubles != NULL);
+
+	if (doubles == NULL) return VECTOR_ERROR;
+
+	if (doubles->data != NULL) free(doubles->data);
+  free(doubles);
+
+	return VECTOR_SUCCESS;
 }
 
 /* Wrapper functions */
@@ -153,7 +172,7 @@ static inline size_t doubles_elem_size__(void)
   return doubles_elem_size();
 }
 
-static inline char *doubles_type__(void)
+static inline int doubles_type__(void)
 {
   return doubles_type();
 }
@@ -205,21 +224,12 @@ static inline void *doubles_offset_next__(void *offset)
 
 static inline Iterator doubles_iterator__(void *self, size_t index)
 {
-  /* Make function to build a generic `Iterator` out of a concrete type - `double` */
-  Iterator iterator;
+  return doubles_iterator(self, index);
+}
 
-  /* Build the vtable once and attach a pointer to it every time */
-  static IteratorTC const iterator_tc = {
-    ._iter_type    = doubles_iter_type__,
-    ._iter_pointer = doubles_iter_pointer__,
-    ._iter_next    = doubles_iter_next__,
-    ._iter_prev    = doubles_iter_prev__,
-  };
-
-  iterator.tc = &iterator_tc;
-  iterator.self = doubles_iterator(self, index);
-
-  return iterator;
+static inline int doubles_destroy__(void *self)
+{
+  return doubles_destroy(self);
 }
 
 /* Make function to build a generic `Vector` out of a concrete type - `Doubles` */
@@ -246,6 +256,7 @@ int doubles_vector_setup(Vector *vector, size_t capacity)
     ._vec_const_offset = doubles_const_offset__,
     ._vec_offset_next  = doubles_offset_next__,
     ._vec_iterator     = doubles_iterator__,
+    ._vec_destroy      = doubles_destroy__,
   };
 
   if (doubles_setup(doubles, capacity) == VECTOR_ERROR) {

@@ -253,8 +253,6 @@ int vector_move_assign(Vector* dest, Vector* src)
 
 int vector_swap(Vector* dest, Vector* src)
 {
-	void* temp;
-
 	assert(dest != NULL);
 	assert(src != NULL);
 	assert(vector_is_initialized(src));

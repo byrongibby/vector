@@ -133,7 +133,7 @@ double *doubles_offset_next(double *offset)
 }
 
 Iterator doubles_iterator(Doubles *doubles, size_t index) {
-  Iterator iterator;
+  Iterator iterator = { NULL, NULL };
 
   assert(doubles != NULL);
   assert(index <= doubles->size);
